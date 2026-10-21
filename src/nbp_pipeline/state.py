@@ -18,7 +18,7 @@ def advance_watermark(candidate: date, path: Path = STATE_PATH) -> date:
     if current is not None and candidate <= current:
         return current
     path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = path.with_suffic(".tmp")
+    tmp = path.with_suffix(".tmp")
     tmp.write_text(json.dumps({"last_loaded_date": candidate.isoformat()}) + "\n")
     tmp.replace(path)
     return candidate

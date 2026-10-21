@@ -7,6 +7,7 @@ import httpx
 
 from nbp_pipeline.ingest import ingest_range
 from nbp_pipeline.state import advance_watermark, read_watermark
+from nbp_pipeline.transform import run_transform
 
 log = logging.getLogger("nbp_pipeline")
 
@@ -35,6 +36,10 @@ def cmd_backfill(args: argparse.Namespace) -> int:
     run(args.from_date, args.to_date or date.today())
     return 0
 
+def cmd_transform(args: argparse.Namespace) -> int:
+    run_transform()
+    return 0
+
 def cmd_not_ready(args: argparse.Namespace) -> int:
     log.error("'%s' is not implemented yet", args.command)
     return 1
@@ -53,7 +58,7 @@ def build_parser()-> argparse.ArgumentParser:
     sub.add_parser("check", help="run data quality checks")
     return parser
 
-COMMANDS ={"ingest": cmd_ingest, "backfill": cmd_backfill} #, "transform": cmd_transform, "check": cmd_check}  
+COMMANDS ={"ingest": cmd_ingest, "backfill": cmd_backfill, "transform": cmd_transform } #"check": cmd_check}  
 
 def main(argv: list[str] | None = None) -> int:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")

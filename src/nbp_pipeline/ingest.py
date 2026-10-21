@@ -16,7 +16,9 @@ MAX_DAYS_PER_REQUEST = 93  # maximum time chunk - NBP rejects ranges longer than
 RAW_DIR = Path("data/raw")
 
 
-def chunk_range(start: date, end: date, max_days: int = MAX_DAYS_PER_REQUEST) -> list[tuple[date, date]]:
+def chunk_range(
+    start: date, end: date, max_days: int = MAX_DAYS_PER_REQUEST
+) -> list[tuple[date, date]]:
     """Function to split the inclusive range [start, end] into chunks of at most max_days."""
     chunks = []
     cursor = start
@@ -27,7 +29,13 @@ def chunk_range(start: date, end: date, max_days: int = MAX_DAYS_PER_REQUEST) ->
     return chunks
 
 
-def fetch_table(client: httpx.Client, start: date, end: date, attempts: int = 3, sleep: Callable[[float], None] = time.sleep,) -> list[dict]:
+def fetch_table(
+    client: httpx.Client,
+    start: date,
+    end: date,
+    attempts: int = 3,
+    sleep: Callable[[float], None] = time.sleep,
+) -> list[dict]:
     """Function to fetch the rate tables NBP published between the incluse range of dates: start and end.
 
     NBP answers 404 when nothing was published in the range (weekends,
@@ -63,7 +71,7 @@ def fetch_table(client: httpx.Client, start: date, end: date, attempts: int = 3,
 
 
 def raw_path(start: date, end: date, ingest_date: date, raw_dir: Path) -> Path:
-    """ Function to figure the location/path  the raw file for one chunk."""
+    """Function to figure the location/path  the raw file for one chunk."""
     folder = raw_dir / f"ingest_date={ingest_date.isoformat()}"
     return folder / f"{start.isoformat()}_{end.isoformat()}.json"
 
@@ -75,7 +83,13 @@ def land_raw(tables: list[dict], path: Path) -> None:
         json.dump(tables, f, ensure_ascii=False, indent=2)
 
 
-def ingest_range(client: httpx.Client, start: date, end: date, raw_dir: Path = RAW_DIR,ingest_date: date | None = None,) -> date | None:
+def ingest_range(
+    client: httpx.Client,
+    start: date,
+    end: date,
+    raw_dir: Path = RAW_DIR,
+    ingest_date: date | None = None,
+) -> date | None:
     """Function to fetch chunks sequential in chronological order and land each chunk as raw JSON.
 
     Chunks already landed today are skipped, so an interrupted backfill can

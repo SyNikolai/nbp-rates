@@ -6,10 +6,19 @@ WITH daily AS (
         currency_code,
         effective_date,
         CAST(mid_rate AS DOUBLE) AS rate,
-        ln(CAST(mid_rate AS DOUBLE) / lag(CAST(mid_rate AS DOUBLE)) OVER by_currency)
-            AS log_return
+        lag(CAST(mid_rate AS DOUBLE)) OVER (
+            PARTITION BY currency_code ORDER BY effective_date
+        ) AS prev_rate
     FROM fct_daily_rates
-    WINDOW by_currency AS (PARTITION BY currency_code ORDER BY effective_date)
+),
+returns AS (
+    SELECT
+        *,
+        -- A log return only exists between two positive rates. Bad rates get
+        -- NULL here instead of crashing the build; the quality checks flag them.
+        CASE WHEN rate > 0 AND prev_rate > 0 THEN ln(rate / prev_rate) END
+            AS log_return
+    FROM daily
 ),
 rolling AS (
     SELECT
@@ -19,7 +28,7 @@ rolling AS (
             ORDER BY effective_date
             ROWS BETWEEN 29 PRECEDING AND CURRENT ROW
         ) AS vol_30d
-    FROM daily
+    FROM returns
 )
 SELECT
     currency_code,

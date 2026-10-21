@@ -6,14 +6,16 @@ from pathlib import Path
 
 STATE_PATH = Path("data/state.json")
 
+
 def read_watermark(path: Path = STATE_PATH) -> date | None:
-    """ Function to return the last loaded effective date or None before the first load . """
+    """Function to return the last loaded effective date or None before the first load ."""
     if not path.exists():
         return None
     return date.fromisoformat(json.loads(path.read_text())["last_loaded_date"])
 
+
 def advance_watermark(candidate: date, path: Path = STATE_PATH) -> date:
-    """ Function to move the watermark forward to next candidate, never back wards, backfill-proof. """
+    """Function to move the watermark forward to next candidate, never back wards, backfill-proof."""
     current = read_watermark(path)
     if current is not None and candidate <= current:
         return current

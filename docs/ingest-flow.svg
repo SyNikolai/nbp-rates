@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 910 580" role="img" aria-labelledby="title">
+  <title id="title">How ingestion handles each date window: skip, fetch, land, retry or fail</title>
+  <style>
+    .bg { fill: #F7F9F8; }
+    .card { fill: #FFFFFF; stroke: #C9D5D1; stroke-width: 1.5; }
+    .key { fill: #E6F0EB; stroke: #2F6B55; stroke-width: 1.5; }
+    .frame { fill: none; stroke: #2F6B55; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .warn { fill: #FBF3E4; stroke: #B7791F; stroke-width: 1.5; }
+    .bad { fill: #FBEAEA; stroke: #B83A3A; stroke-width: 1.5; }
+    .t { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; fill: #15302A; }
+    .h { font-weight: 700; font-size: 15px; }
+    .s { font-size: 12.5px; fill: #566B65; }
+    .lab { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; fill: #566B65; }
+    .m { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11.5px; fill: #2F6B55; }
+    .mh { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12.5px; font-weight: 700; fill: #15302A; }
+    .wt { fill: #8A5A12; }
+    .bt { fill: #9A2E2E; }
+    .ln { stroke: #2F6B55; stroke-width: 2; fill: none; }
+    .dash { stroke: #566B65; stroke-width: 1.5; fill: none; stroke-dasharray: 4 4; }
+    .ah { fill: #2F6B55; }
+    .ahm { fill: #566B65; }
+    .band { fill: #E6F0EB; }
+    @media (prefers-color-scheme: dark) {
+      .bg { fill: #0F1A17; }
+      .card { fill: #16241F; stroke: #2A3B35; }
+      .key { fill: #1C3229; stroke: #7CC4A4; }
+      .frame { stroke: #7CC4A4; }
+      .warn { fill: #2E2614; stroke: #E0B060; }
+      .bad { fill: #301B1B; stroke: #E07A7A; }
+      .t { fill: #E3ECE8; }
+      .s, .lab { fill: #93A8A1; }
+      .m { fill: #7CC4A4; }
+      .mh { fill: #E3ECE8; }
+      .wt { fill: #E0B060; }
+      .bt { fill: #E07A7A; }
+      .ln { stroke: #7CC4A4; }
+      .dash { stroke: #93A8A1; }
+      .ah { fill: #7CC4A4; }
+      .ahm { fill: #93A8A1; }
+      .band { fill: #1C3229; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+    <marker id="am" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ahm" d="M0,0 L10,5 L0,10 z"/></marker>
+  </defs>
+  <rect class="bg" width="910" height="580" rx="14"/>
+
+  <rect class="band" x="300" y="22" width="300" height="40" rx="20"/>
+  <text class="t h" x="450" y="47" text-anchor="middle">For each window of ≤ 93 days</text>
+  <path class="ln" d="M450 62 V94" marker-end="url(#a)"/>
+
+  <rect class="card" x="280" y="98" width="340" height="56" rx="10"/>
+  <text class="t h" x="450" y="123" text-anchor="middle">Raw file already landed today?</text>
+  <text class="t m" x="450" y="143" text-anchor="middle">path.exists()</text>
+  <path class="ln" d="M620 126 H696" marker-end="url(#a)"/>
+  <text class="t s" x="645" y="118">yes</text>
+  <rect class="card" x="700" y="98" width="190" height="56" rx="10"/>
+  <text class="t h" x="714" y="122">Skip, no request</text>
+  <text class="t s" x="714" y="142">backfills can resume</text>
+
+  <path class="ln" d="M450 154 V194" marker-end="url(#a)"/>
+  <text class="t s" x="460" y="180">no</text>
+
+  <rect class="key" x="290" y="198" width="320" height="52" rx="10"/>
+  <text class="t mh" x="450" y="229" text-anchor="middle">GET /tables/A/{start}/{end}/</text>
+
+  <path class="ln" d="M450 250 V286" marker-end="url(#a)"/>
+  <rect class="card" x="380" y="290" width="140" height="40" rx="20"/>
+  <text class="t h" x="450" y="315" text-anchor="middle">Status?</text>
+
+  <path class="ln" d="M450 330 V352 M120 352 H780" />
+  <path class="ln" d="M120 352 V376" marker-end="url(#a)"/>
+  <path class="ln" d="M340 352 V376" marker-end="url(#a)"/>
+  <path class="ln" d="M560 352 V376" marker-end="url(#a)"/>
+  <path class="ln" d="M780 352 V376" marker-end="url(#a)"/>
+
+  <rect class="key" x="25" y="380" width="190" height="84" rx="10"/>
+  <text class="t h" x="39" y="405">200 OK</text>
+  <text class="t s" x="39" y="428">land raw JSON</text>
+  <text class="t m" x="39" y="448">open("x"): no overwrite</text>
+
+  <rect class="card" x="245" y="380" width="190" height="84" rx="10"/>
+  <text class="t h" x="259" y="405">404 Not Found</text>
+  <text class="t s" x="259" y="428">weekend or holiday:</text>
+  <text class="t s" x="259" y="448">no data, carry on</text>
+
+  <rect class="bad" x="465" y="380" width="190" height="84" rx="10"/>
+  <text class="t h bt" x="479" y="405">Other 4xx</text>
+  <text class="t s" x="479" y="428">the request is wrong:</text>
+  <text class="t s" x="479" y="448">fail immediately</text>
+
+  <rect class="warn" x="685" y="380" width="190" height="84" rx="10"/>
+  <text class="t h wt" x="699" y="405">5xx or timeout</text>
+  <text class="t s" x="699" y="428">wait 1s, then 2s,</text>
+  <text class="t s" x="699" y="448">max 3 attempts</text>
+  <path class="dash" d="M875 422 H893 V224 H614" marker-end="url(#am)"/>
+  <text class="t s" x="804" y="216">retry</text>
+
+  <path class="ln" d="M120 464 V496" marker-end="url(#a)"/>
+  <rect class="band" x="25" y="500" width="470" height="56" rx="10"/>
+  <text class="t h" x="39" y="524">After the last window: advance the watermark</text>
+  <text class="t s" x="39" y="544">to the newest date landed, forward only, temp file + rename</text>
+</svg>

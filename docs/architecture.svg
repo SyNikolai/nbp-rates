@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 520" role="img" aria-labelledby="title">
+  <title id="title">Pipeline architecture: NBP API to raw JSON, Parquet staging, DuckDB warehouse and quality checks</title>
+  <style>
+    .bg { fill: #F7F9F8; }
+    .card { fill: #FFFFFF; stroke: #C9D5D1; stroke-width: 1.5; }
+    .key { fill: #E6F0EB; stroke: #2F6B55; stroke-width: 1.5; }
+    .frame { fill: none; stroke: #2F6B55; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .warn { fill: #FBF3E4; stroke: #B7791F; stroke-width: 1.5; }
+    .bad { fill: #FBEAEA; stroke: #B83A3A; stroke-width: 1.5; }
+    .t { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; fill: #15302A; }
+    .h { font-weight: 700; font-size: 15px; }
+    .s { font-size: 12.5px; fill: #566B65; }
+    .lab { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; fill: #566B65; }
+    .m { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11.5px; fill: #2F6B55; }
+    .mh { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12.5px; font-weight: 700; fill: #15302A; }
+    .wt { fill: #8A5A12; }
+    .bt { fill: #9A2E2E; }
+    .ln { stroke: #2F6B55; stroke-width: 2; fill: none; }
+    .dash { stroke: #566B65; stroke-width: 1.5; fill: none; stroke-dasharray: 4 4; }
+    .ah { fill: #2F6B55; }
+    .ahm { fill: #566B65; }
+    .band { fill: #E6F0EB; }
+    @media (prefers-color-scheme: dark) {
+      .bg { fill: #0F1A17; }
+      .card { fill: #16241F; stroke: #2A3B35; }
+      .key { fill: #1C3229; stroke: #7CC4A4; }
+      .frame { stroke: #7CC4A4; }
+      .warn { fill: #2E2614; stroke: #E0B060; }
+      .bad { fill: #301B1B; stroke: #E07A7A; }
+      .t { fill: #E3ECE8; }
+      .s, .lab { fill: #93A8A1; }
+      .m { fill: #7CC4A4; }
+      .mh { fill: #E3ECE8; }
+      .wt { fill: #E0B060; }
+      .bt { fill: #E07A7A; }
+      .ln { stroke: #7CC4A4; }
+      .dash { stroke: #93A8A1; }
+      .ah { fill: #7CC4A4; }
+      .ahm { fill: #93A8A1; }
+      .band { fill: #1C3229; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+    <marker id="am" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ahm" d="M0,0 L10,5 L0,10 z"/></marker>
+  </defs>
+  <rect class="bg" width="1080" height="520" rx="14"/>
+
+  <text class="t lab" x="20" y="48">SOURCE</text>
+  <text class="t lab" x="220" y="48">INGEST · PYTHON</text>
+  <text class="t lab" x="450" y="48">RAW LAYER</text>
+  <text class="t lab" x="660" y="48">STAGING LAYER</text>
+  <text class="t lab" x="870" y="48">WAREHOUSE · DUCKDB</text>
+
+  <!-- source -->
+  <rect class="card" x="20" y="70" width="150" height="130" rx="10"/>
+  <text class="t h" x="34" y="98">NBP Web API</text>
+  <text class="t m" x="34" y="120">api.nbp.pl</text>
+  <text class="t s" x="34" y="144">Table A mid rates</text>
+  <text class="t s" x="34" y="164">≤ 93 days / request</text>
+  <text class="t s" x="34" y="184">404 on days off</text>
+
+  <!-- ingest -->
+  <rect class="key" x="220" y="70" width="180" height="180" rx="10"/>
+  <text class="t mh" x="234" y="98">ingest.py</text>
+  <text class="t s" x="234" y="124">• 93-day windows</text>
+  <text class="t s" x="234" y="146">• retry 5xx: 1s, 2s</text>
+  <text class="t s" x="234" y="168">• 404 = no data</text>
+  <text class="t s" x="234" y="190">• other 4xx: fail fast</text>
+  <text class="t s" x="234" y="212">• skip landed windows</text>
+  <text class="t s" x="234" y="234">• httpx, injectable</text>
+
+  <rect class="card" x="220" y="295" width="180" height="90" rx="10"/>
+  <text class="t mh" x="234" y="322">state.py</text>
+  <text class="t s" x="234" y="345">watermark: last date</text>
+  <text class="t s" x="234" y="366">forward-only, atomic</text>
+  <path class="dash" d="M310 253 V292" marker-start="url(#am)" marker-end="url(#am)"/>
+  <text class="t s" x="318" y="278">read / advance</text>
+
+  <!-- raw -->
+  <rect class="card" x="450" y="70" width="160" height="160" rx="10"/>
+  <text class="t h" x="464" y="98">JSON files</text>
+  <text class="t m" x="464" y="122">data/raw/</text>
+  <text class="t m" x="464" y="140">ingest_date=…/</text>
+  <text class="t m" x="464" y="158">{start}_{end}.json</text>
+  <text class="t s" x="464" y="186">written once,</text>
+  <text class="t s" x="464" y="206">never modified</text>
+
+  <!-- staging -->
+  <rect class="card" x="660" y="70" width="160" height="160" rx="10"/>
+  <text class="t h" x="674" y="98">Parquet</text>
+  <text class="t m" x="674" y="122">data/staging/</text>
+  <text class="t m" x="674" y="140">year=/month=/</text>
+  <text class="t s" x="674" y="166">typed, DECIMAL</text>
+  <text class="t s" x="674" y="186">rebuilt each run</text>
+  <text class="t m" x="674" y="212">staging.sql</text>
+
+  <!-- warehouse -->
+  <rect class="frame" x="870" y="62" width="190" height="275" rx="12"/>
+  <text class="t m" x="884" y="84">warehouse.duckdb</text>
+  <rect class="key" x="882" y="96" width="166" height="96" rx="9"/>
+  <text class="t mh" x="894" y="120">fct_daily_rates</text>
+  <text class="t s" x="894" y="142">PK currency + date</text>
+  <text class="t s" x="894" y="162">upsert, latest wins</text>
+  <text class="t m" x="894" y="182">warehouse.sql</text>
+  <rect class="card" x="882" y="226" width="166" height="96" rx="9"/>
+  <text class="t mh" x="894" y="250" style="font-size:11px">mart_monthly_volatility</text>
+  <text class="t s" x="894" y="272">window functions</text>
+  <text class="t s" x="894" y="292">rate, return, risk</text>
+  <text class="t m" x="894" y="312">marts.sql</text>
+  <path class="ln" d="M965 192 V222" marker-end="url(#a)"/>
+
+  <!-- quality -->
+  <rect class="warn" x="870" y="365" width="190" height="72" rx="10"/>
+  <text class="t mh" x="884" y="390">quality.py</text>
+  <text class="t s" x="884" y="412">5 checks, exit code 1</text>
+  <text class="t s" x="884" y="431">if anything fails</text>
+  <path class="ln" d="M965 337 V361" marker-end="url(#a)"/>
+
+  <!-- main flow arrows -->
+  <path class="ln" d="M170 140 H216" marker-end="url(#a)"/>
+  <path class="ln" d="M400 140 H446" marker-end="url(#a)"/>
+  <path class="ln" d="M610 140 H656" marker-end="url(#a)"/>
+  <path class="ln" d="M820 140 H878" marker-end="url(#a)"/>
+
+  <!-- replay note -->
+  <path class="dash" d="M530 230 V300 H740 V234" marker-end="url(#am)"/>
+  <text class="t s" x="545" y="320">make clean + transform: rebuild from raw</text>
+
+  <!-- delivery band -->
+  <rect class="band" x="20" y="462" width="1040" height="40" rx="8"/>
+  <text class="t s" x="40" y="487"><tspan font-weight="700">Runs with</tspan>  make targets  ·  Docker image (non-root, locked deps)  ·  GitHub Actions: lint → 22 tests → image build</text>
+</svg>

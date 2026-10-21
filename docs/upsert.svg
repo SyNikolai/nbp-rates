@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 345" role="img" aria-labelledby="title">
+  <title id="title">Deduplication: when a day is fetched twice, the latest ingest wins</title>
+  <style>
+    .bg { fill: #F7F9F8; }
+    .card { fill: #FFFFFF; stroke: #C9D5D1; stroke-width: 1.5; }
+    .key { fill: #E6F0EB; stroke: #2F6B55; stroke-width: 1.5; }
+    .frame { fill: none; stroke: #2F6B55; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .warn { fill: #FBF3E4; stroke: #B7791F; stroke-width: 1.5; }
+    .bad { fill: #FBEAEA; stroke: #B83A3A; stroke-width: 1.5; }
+    .t { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; fill: #15302A; }
+    .h { font-weight: 700; font-size: 15px; }
+    .s { font-size: 12.5px; fill: #566B65; }
+    .lab { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; fill: #566B65; }
+    .m { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11.5px; fill: #2F6B55; }
+    .mh { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12.5px; font-weight: 700; fill: #15302A; }
+    .wt { fill: #8A5A12; }
+    .bt { fill: #9A2E2E; }
+    .ln { stroke: #2F6B55; stroke-width: 2; fill: none; }
+    .dash { stroke: #566B65; stroke-width: 1.5; fill: none; stroke-dasharray: 4 4; }
+    .ah { fill: #2F6B55; }
+    .ahm { fill: #566B65; }
+    .band { fill: #E6F0EB; }
+    @media (prefers-color-scheme: dark) {
+      .bg { fill: #0F1A17; }
+      .card { fill: #16241F; stroke: #2A3B35; }
+      .key { fill: #1C3229; stroke: #7CC4A4; }
+      .frame { stroke: #7CC4A4; }
+      .warn { fill: #2E2614; stroke: #E0B060; }
+      .bad { fill: #301B1B; stroke: #E07A7A; }
+      .t { fill: #E3ECE8; }
+      .s, .lab { fill: #93A8A1; }
+      .m { fill: #7CC4A4; }
+      .mh { fill: #E3ECE8; }
+      .wt { fill: #E0B060; }
+      .bt { fill: #E07A7A; }
+      .ln { stroke: #7CC4A4; }
+      .dash { stroke: #93A8A1; }
+      .ah { fill: #7CC4A4; }
+      .ahm { fill: #93A8A1; }
+      .band { fill: #1C3229; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+    <marker id="am" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ahm" d="M0,0 L10,5 L0,10 z"/></marker>
+  </defs>
+  <rect class="bg" width="900" height="345" rx="14"/>
+  <text class="t lab" x="290.0" y="40" text-anchor="middle">MON 2 MAR</text>
+  <text class="t lab" x="420.0" y="40" text-anchor="middle">TUE 3 MAR</text>
+  <text class="t lab" x="550.0" y="40" text-anchor="middle">WED 4 MAR</text>
+  <text class="t lab" x="680.0" y="40" text-anchor="middle">THU 5 MAR</text>
+  <text class="t lab" x="810.0" y="40" text-anchor="middle">FRI 6 MAR</text>
+  <text class="t h" x="20" y="82">Raw file 1</text>
+  <text class="t m" x="20" y="102">ingest_date=2026-10-20</text>
+  <rect class="card" x="230" y="58" width="120" height="56" rx="8"/>
+  <text class="t h" x="290.0" y="91" text-anchor="middle" style="text-decoration:line-through;opacity:0.45">EUR 4.25</text>
+  <rect class="card" x="360" y="58" width="120" height="56" rx="8"/>
+  <text class="t h" x="420.0" y="91" text-anchor="middle" style="text-decoration:line-through;opacity:0.45">EUR 4.25</text>
+  <rect class="card" x="490" y="58" width="120" height="56" rx="8"/>
+  <text class="t h" x="550.0" y="91" text-anchor="middle">EUR 4.25</text>
+  <rect class="card" x="620" y="58" width="120" height="56" rx="8"/>
+  <text class="t h" x="680.0" y="91" text-anchor="middle">EUR 4.25</text>
+  <rect class="card" x="750" y="58" width="120" height="56" rx="8"/>
+  <text class="t h" x="810.0" y="91" text-anchor="middle">EUR 4.25</text>
+  <text class="t h" x="20" y="156">Raw file 2</text>
+  <text class="t m" x="20" y="176">ingest_date=2026-10-21</text>
+  <rect class="card" x="230" y="132" width="120" height="56" rx="8"/>
+  <text class="t h" x="290.0" y="165" text-anchor="middle">EUR 4.30</text>
+  <rect class="card" x="360" y="132" width="120" height="56" rx="8"/>
+  <text class="t h" x="420.0" y="165" text-anchor="middle">EUR 4.30</text>
+  <path class="ln" d="M450 200 V228" marker-end="url(#a)"/>
+  <text class="t m" x="462" y="218">QUALIFY row_number() … ORDER BY ingest_date DESC = 1</text>
+  <text class="t h" x="20" y="260">fct_daily_rates</text>
+  <text class="t s" x="20" y="280">one row per day</text>
+  <rect class="key" x="230" y="236" width="120" height="56" rx="8"/>
+  <text class="t h" x="290.0" y="263" text-anchor="middle">EUR 4.30</text>
+  <text class="t s" x="290.0" y="281" text-anchor="middle">from file 2</text>
+  <rect class="key" x="360" y="236" width="120" height="56" rx="8"/>
+  <text class="t h" x="420.0" y="263" text-anchor="middle">EUR 4.30</text>
+  <text class="t s" x="420.0" y="281" text-anchor="middle">from file 2</text>
+  <rect class="key" x="490" y="236" width="120" height="56" rx="8"/>
+  <text class="t h" x="550.0" y="263" text-anchor="middle">EUR 4.25</text>
+  <text class="t s" x="550.0" y="281" text-anchor="middle">from file 1</text>
+  <rect class="key" x="620" y="236" width="120" height="56" rx="8"/>
+  <text class="t h" x="680.0" y="263" text-anchor="middle">EUR 4.25</text>
+  <text class="t s" x="680.0" y="281" text-anchor="middle">from file 1</text>
+  <rect class="key" x="750" y="236" width="120" height="56" rx="8"/>
+  <text class="t h" x="810.0" y="263" text-anchor="middle">EUR 4.25</text>
+  <text class="t s" x="810.0" y="281" text-anchor="middle">from file 1</text>
+  <text class="t s" x="20" y="322">Days fetched twice keep the newer value; everything else is untouched. Running the load again changes nothing.</text>
+</svg>

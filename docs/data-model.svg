@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" role="img" aria-labelledby="title">
+  <title id="title">Data model: stg_rates view, fct_daily_rates fact table and mart_monthly_volatility</title>
+  <style>
+    .bg { fill: #F7F9F8; }
+    .card { fill: #FFFFFF; stroke: #C9D5D1; stroke-width: 1.5; }
+    .key { fill: #E6F0EB; stroke: #2F6B55; stroke-width: 1.5; }
+    .frame { fill: none; stroke: #2F6B55; stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .warn { fill: #FBF3E4; stroke: #B7791F; stroke-width: 1.5; }
+    .bad { fill: #FBEAEA; stroke: #B83A3A; stroke-width: 1.5; }
+    .t { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; fill: #15302A; }
+    .h { font-weight: 700; font-size: 15px; }
+    .s { font-size: 12.5px; fill: #566B65; }
+    .lab { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; fill: #566B65; }
+    .m { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11.5px; fill: #2F6B55; }
+    .mh { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12.5px; font-weight: 700; fill: #15302A; }
+    .wt { fill: #8A5A12; }
+    .bt { fill: #9A2E2E; }
+    .ln { stroke: #2F6B55; stroke-width: 2; fill: none; }
+    .dash { stroke: #566B65; stroke-width: 1.5; fill: none; stroke-dasharray: 4 4; }
+    .ah { fill: #2F6B55; }
+    .ahm { fill: #566B65; }
+    .band { fill: #E6F0EB; }
+    @media (prefers-color-scheme: dark) {
+      .bg { fill: #0F1A17; }
+      .card { fill: #16241F; stroke: #2A3B35; }
+      .key { fill: #1C3229; stroke: #7CC4A4; }
+      .frame { stroke: #7CC4A4; }
+      .warn { fill: #2E2614; stroke: #E0B060; }
+      .bad { fill: #301B1B; stroke: #E07A7A; }
+      .t { fill: #E3ECE8; }
+      .s, .lab { fill: #93A8A1; }
+      .m { fill: #7CC4A4; }
+      .mh { fill: #E3ECE8; }
+      .wt { fill: #E0B060; }
+      .bt { fill: #E07A7A; }
+      .ln { stroke: #7CC4A4; }
+      .dash { stroke: #93A8A1; }
+      .ah { fill: #7CC4A4; }
+      .ahm { fill: #93A8A1; }
+      .band { fill: #1C3229; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+    <marker id="am" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ahm" d="M0,0 L10,5 L0,10 z"/></marker>
+  </defs>
+  <rect class="bg" width="1000" height="400" rx="14"/>
+
+  <!-- stg -->
+  <text class="t lab" x="20" y="40">STAGING VIEW</text>
+  <rect class="card" x="20" y="52" width="280" height="262" rx="10"/>
+  <text class="t mh" x="34" y="78">stg_rates</text>
+  <line class="dash" x1="20" y1="90" x2="300" y2="90" style="stroke-dasharray:none;stroke-width:1"/>
+  <text class="t m" x="34" y="112">currency_code</text><text class="t s" x="286" y="112" text-anchor="end">VARCHAR</text>
+  <text class="t m" x="34" y="134">currency_name</text><text class="t s" x="286" y="134" text-anchor="end">VARCHAR</text>
+  <text class="t m" x="34" y="156">effective_date</text><text class="t s" x="286" y="156" text-anchor="end">DATE</text>
+  <text class="t m" x="34" y="178">mid_rate</text><text class="t s" x="286" y="178" text-anchor="end">DECIMAL(18,8)</text>
+  <text class="t m" x="34" y="200">table_no</text><text class="t s" x="286" y="200" text-anchor="end">VARCHAR</text>
+  <text class="t m" x="34" y="222">ingest_date</text><text class="t s" x="286" y="222" text-anchor="end">DATE</text>
+  <text class="t m" x="34" y="244">source_file</text><text class="t s" x="286" y="244" text-anchor="end">VARCHAR</text>
+  <text class="t m" x="34" y="266">year, month</text><text class="t s" x="286" y="266" text-anchor="end">partitions</text>
+  <text class="t s" x="34" y="296">one row per currency per fetch</text>
+  <text class="t s" x="20" y="342">Reads the Parquet folders directly;</text>
+  <text class="t s" x="20" y="362">the same day can appear twice.</text>
+
+  <!-- fct -->
+  <text class="t lab" x="360" y="40">FACT TABLE</text>
+  <rect class="key" x="360" y="52" width="280" height="262" rx="10"/>
+  <text class="t mh" x="374" y="78">fct_daily_rates</text>
+  <line class="dash" x1="360" y1="90" x2="640" y2="90" style="stroke-dasharray:none;stroke-width:1"/>
+  <text class="t m" x="374" y="112">currency_code</text><rect class="band" x="510" y="99" width="30" height="18" rx="4"/><text class="t lab" x="525" y="112" text-anchor="middle">PK</text><text class="t s" x="626" y="112" text-anchor="end">VARCHAR</text>
+  <text class="t m" x="374" y="134">effective_date</text><rect class="band" x="510" y="121" width="30" height="18" rx="4"/><text class="t lab" x="525" y="134" text-anchor="middle">PK</text><text class="t s" x="626" y="134" text-anchor="end">DATE</text>
+  <text class="t m" x="374" y="156">currency_name</text><text class="t s" x="626" y="156" text-anchor="end">VARCHAR</text>
+  <text class="t m" x="374" y="178">mid_rate</text><text class="t s" x="626" y="178" text-anchor="end">DECIMAL(18,8)</text>
+  <text class="t m" x="374" y="200">table_no</text><text class="t s" x="626" y="200" text-anchor="end">VARCHAR</text>
+  <text class="t m" x="374" y="222">ingest_date</text><text class="t s" x="626" y="222" text-anchor="end">DATE</text>
+  <text class="t s" x="374" y="296">one row per currency per day</text>
+  <text class="t s" x="360" y="342">Duplicates collapsed: the latest</text>
+  <text class="t s" x="360" y="362">ingest_date wins (QUALIFY + upsert).</text>
+
+  <!-- mart -->
+  <text class="t lab" x="700" y="40">MART</text>
+  <rect class="card" x="700" y="52" width="280" height="262" rx="10"/>
+  <text class="t mh" x="714" y="78" style="font-size:12px">mart_monthly_volatility</text>
+  <line class="dash" x1="700" y1="90" x2="980" y2="90" style="stroke-dasharray:none;stroke-width:1"/>
+  <text class="t m" x="714" y="112">currency_code</text><text class="t s" x="966" y="112" text-anchor="end">VARCHAR</text>
+  <text class="t m" x="714" y="134">month</text><text class="t s" x="966" y="134" text-anchor="end">DATE</text>
+  <text class="t m" x="714" y="156">trading_days</text><text class="t s" x="966" y="156" text-anchor="end">BIGINT</text>
+  <text class="t m" x="714" y="178">month_end_rate</text><text class="t s" x="966" y="178" text-anchor="end">DOUBLE</text>
+  <text class="t m" x="714" y="200">monthly_return_pct</text><text class="t s" x="966" y="200" text-anchor="end">DOUBLE</text>
+  <text class="t m" x="714" y="222">volatility_30d_pct</text><text class="t s" x="966" y="222" text-anchor="end">DOUBLE</text>
+  <text class="t s" x="714" y="296">one row per currency per month</text>
+  <text class="t s" x="700" y="342">lag, ln, stddev_samp over 30 rows</text>
+  <text class="t s" x="700" y="362">and arg_max for month-end values.</text>
+
+  <path class="ln" d="M300 183 H356" marker-end="url(#a)"/>
+  <path class="ln" d="M640 183 H696" marker-end="url(#a)"/>
+</svg>

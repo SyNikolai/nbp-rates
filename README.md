@@ -59,7 +59,7 @@ for attempt in range(1, attempts + 1):
     try:
         response = client.get(url, params={"format": "json"})
         if response.status_code == 404:
-            return []                    # weekend or holiday: no table, not an error
+            return []  # weekend or holiday: no table, not an error
         response.raise_for_status()
         return response.json()
     except (httpx.TransportError, httpx.HTTPStatusError) as exc:
@@ -68,7 +68,7 @@ for attempt in range(1, attempts + 1):
         )
         if not retryable or attempt == attempts:
             raise
-        sleep(2 ** (attempt - 1))        # wait 1s, then 2s
+        sleep(2 ** (attempt - 1))  # wait 1s, then 2s
 ```
 
 What this shows:
@@ -100,10 +100,10 @@ and asks the API only for the days after it.
 def advance_watermark(candidate: date, path: Path = STATE_PATH) -> date:
     current = read_watermark(path)
     if current is not None and candidate <= current:
-        return current                   # never move backwards
+        return current  # never move backwards
     tmp = path.with_suffix(".tmp")
     tmp.write_text(json.dumps({"last_loaded_date": candidate.isoformat()}) + "\n")
-    tmp.replace(path)                    # atomic: all or nothing
+    tmp.replace(path)  # atomic: all or nothing
     return candidate
 ```
 

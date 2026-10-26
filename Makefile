@@ -4,7 +4,7 @@
 FROM ?= 2020-01-01
 RUN := uv run python -m nbp_pipeline.cli
 
-help: ## possible targets
+help: ## Possible targets
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf " \033[36m%-10s\033[0m %s\n", $$1, $$2}'
 
 ingest: ## Fetching new rates since last watermark
@@ -16,19 +16,19 @@ backfill: ## Fetch history since FROM (default 01-01-2020)
 transform: ## Build the parquet staging and DuckDB warehouse
 	$(RUN) transform
 
-check: ## daa quality check
+check: ## Data quality check
 	$(RUN) check
 
-test: ## unit tests
+test: ## Unit tests
 	uv run pytest -q
 
-lint: ## liniting and formatticng check
+lint: ## Liniting and formatticng check
 	uv run ruff check .
 	uv run ruff format --check .
 
-format: ## auto fix lint and format issues
+format: ## Auto fix lint and format issues
 	uv run ruff check --fix .
 	uv run ruff format .
 
-clean: ## delete staging and warehouse
+clean: ## Delete staging and warehouse
 	rm -rf dta/staging data/warehouse.duckdb

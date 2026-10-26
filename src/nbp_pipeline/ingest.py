@@ -77,7 +77,7 @@ def raw_path(start: date, end: date, ingest_date: date, raw_dir: Path) -> Path:
 
 
 def land_raw(tables: list[dict], path: Path) -> None:
-    """Functiion to write tables to path. Mode "x" makes the OS refuse to overwrite."""
+    """Function to write tables to path. Mode "x" makes the OS refuse to overwrite."""
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("x", encoding="utf-8") as f:
         json.dump(tables, f, ensure_ascii=False, indent=2)
